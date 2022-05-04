@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 # Create your serializers here
-from FinalApp.models import Farmer, Customer, Payments, Bill, Orders, BillDetails, CustomerBill
+from PosApp.models import Farmer, Customer, Payments, Bill, Orders, BillDetails, CustomerBill
 
 
 class FarmerSerializer(serializers.ModelSerializer):

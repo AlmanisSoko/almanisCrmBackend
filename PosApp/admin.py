@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from FinalApp.models import Farmer, Customer, Orders, Bill, BillDetails, Payments
+from PosApp.models import Farmer, Customer, Orders, Bill, BillDetails, Payments
 
 admin.site.register(Farmer)
 admin.site.register(Customer)
