@@ -18,8 +18,8 @@ from django.urls import path, include
 from rest_framework import routers
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from FinaleApp import views
-from FinaleApp.views import CustomerNameViewSet, FarmerNameViewSet, OrderNameViewSet, OrderByNameViewSet, \
+from FinalApp import views
+from FinalApp.views import CustomerNameViewSet, FarmerNameViewSet, OrderNameViewSet, OrderByNameViewSet, \
     CustomerOnlyViewSet, FarmerOnlyViewSet, CustomerDetailViewSet
 
 router = routers.DefaultRouter()

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 # Create your serializers here
-from FinaleApp.models import Farmer, Customer, Payments, Bill, Orders, BillDetails, CustomerBill
+from FinalApp.models import Farmer, Customer, Payments, Bill, Orders, BillDetails, CustomerBill
 
 
 class FarmerSerializer(serializers.ModelSerializer):
@@ -65,14 +65,3 @@ class CustomerBillSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomerBill
         fields = "__all__"
-
-
-# class BillsSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Bill
-#         fields = "__all__"
-#
-#     def to_representation(self, instance):
-#         response = super().to_representation(instance)
-#         response["customerbill"] = CustomerBillSerializer(instance.customerbill_id).data
-#         return response

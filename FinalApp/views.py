@@ -8,8 +8,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from FinaleApp.models import Farmer, Orders, Customer, BillDetails, Payments, Bill
-from FinaleApp.serializers import FarmerSerializer, OrdersSerializer, CustomerSerializer, BillSerializer, \
+from FinalApp.models import Farmer, Orders, Customer, BillDetails, Payments, Bill
+from FinalApp.serializers import FarmerSerializer, OrdersSerializer, CustomerSerializer, BillSerializer, \
     PaymentsSerializer, BillDetailsSerializer, CustomerBillSerializer
 
 
