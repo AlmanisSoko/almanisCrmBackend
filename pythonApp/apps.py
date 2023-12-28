@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class PosappConfig(AppConfig):
+class PythonappConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'PosApp'
+    name = 'pythonApp'
