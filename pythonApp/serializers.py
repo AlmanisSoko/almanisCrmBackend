@@ -6,12 +6,16 @@ from django.utils.timezone import make_aware
 
 User = get_user_model()
 
+from pythonApp.models import Farmer, Customer, Payments, Bill, Orders, BillDetails, CustomerBill, RicePrice, Region, \
+    Invoice, InvoiceDetails, Tickets, FarmerStock
+
+
 class UserCreateSerializer(UserCreateSerializer):
     user_type = serializers.CharField(default='normal', required=False)  # Add user_type field with default value
 
     class Meta(UserCreateSerializer.Meta):
         model = User
-        fields = ('id', 'email', 'first_name', 'last_name', 'phone', 'password', 'user_type')  # Include user_type in fields
+        fields = '__all__'  # Include user_type in fields
 
     def validate(self, attrs):
         attrs = super().validate(attrs)
@@ -51,7 +55,7 @@ class CustomUserSerializer(UserSerializer):
 class UserAccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email', 'phone')
+        fields = '__all__'
 
     def update(self, instance, validated_data):
         # Allow admins to update name and phone without email uniqueness check
@@ -68,3 +72,146 @@ class UserAccountSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+
+
+class FarmerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Farmer
+        fields = "__all__"
+
+
+class CustomerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Customer
+        fields = "__all__"
+
+
+class BillSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Bill
+        fields = "__all__"
+
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response["customerbill"] = CustomerBillSerializer(instance.customerbill_id).data
+        return response
+
+
+class BillDetailsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BillDetails
+        fields = "__all__"
+
+
+# class OrdersSerializer(serializers.ModelSerializer):
+#     user = UserCreateSerializer(read_only=True)
+#
+#     class Meta:
+#         model = Orders
+#         fields = "__all__"
+#
+#     def to_representation(self, instance):
+#         response = super().to_representation(instance)
+#         response["user"] = instance.user_id
+#         response["farmer"] = FarmerSerializer(instance.farmer_id).data
+#         response["customer"] = CustomerSerializer(instance.customer_id).data
+#         return response
+#
+
+class OrdersSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Orders
+        fields = "__all__"
+
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response["user"] = self.get_user(instance)  # Call the get_user method
+        response["farmer"] = FarmerSerializer(instance.farmer_id).data
+        response["customer"] = CustomerSerializer(instance.customer_id).data
+        return response
+
+    def get_user(self, instance):
+        # Assuming 'username' is a field in your UserAccount model
+        return instance.user_id.first_name
+
+
+class OrderDateSerializer(serializers.Serializer):
+    start_date = serializers.DateTimeField()
+    end_date = serializers.DateTimeField()
+
+
+class PaymentsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Payments
+        fields = "__all__"
+
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response["orders"] = OrdersSerializer(instance.orders_id).data
+        response["customer"] = CustomerSerializer(instance.customer_id).data
+        return response
+
+
+class CustomerBillSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomerBill
+        fields = "__all__"
+
+
+class RicePriceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RicePrice
+        fields = "__all__"
+
+
+class RegionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Region
+        fields = "__all__"
+
+
+class InvoiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Invoice
+        fields = "__all__"
+
+
+class InvoiceDetailsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InvoiceDetails
+        fields = "__all__"
+
+
+class InvoiceDetailedSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InvoiceDetails
+        fields = "__all__"
+
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response["invoice"] = InvoiceSerializer(instance.invoice_id).data
+        return response
+
+
+class TicketsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tickets
+        fields = "__all__"
+
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response["farmer"] = FarmerSerializer(instance.farmer_id).data
+        return response
+
+
+class FarmerStockSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FarmerStock
+        fields = "__all__"
+
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response["farmer"] = FarmerSerializer(instance.farmer_id).data
+        return response
