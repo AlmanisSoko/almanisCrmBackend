@@ -5,12 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5088a076-5cb2-4e0b-a274-1b002b0a44de" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/dbnavigator.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dbnavigator.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pythonApp/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/pythonApp/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pythonApp/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/pythonApp/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pythonApp/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/pythonApp/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pythonProject/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/pythonProject/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pythonProject/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/pythonProject/settings.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,10 +38,13 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;newbackend&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/BraIT/Desktop/PROJECTS 2/New folder/brmss/manage.py&quot;
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/BraIT/Desktop/PROJECTS 2/New folder/brmss&quot;
   }
 }</component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\BraIT\Desktop\PROJECTS 2\New folder\brmss" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\BraIT\Desktop\PROJECTS 2\New folder\brmss\pythonProject" />
       <recent name="C:\Users\BraIT\Desktop\PROJECTS 2\New folder\brmss" />
@@ -99,6 +102,41 @@
           <url>file://$PROJECT_DIR$/pythonProject/settings.py</url>
           <line>114</line>
           <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pythonApp/models.py</url>
+          <line>159</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pythonApp/models.py</url>
+          <line>81</line>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pythonApp/views.py</url>
+          <line>533</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pythonApp/views.py</url>
+          <line>425</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pythonApp/views.py</url>
+          <line>405</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pythonApp/views.py</url>
+          <line>211</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pythonApp/models.py</url>
+          <line>6</line>
+          <option name="timeStamp" value="9" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

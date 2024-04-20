@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 
 
 class UserAccountManager(BaseUserManager):
@@ -78,7 +80,7 @@ class Customer(models.Model):
 
 
 class Orders(models.Model):
-    choices1 = ((1, "Pishori"), (2, "Komboka"))
+    choices1 = ((1, "Pishori"), (2, "Komboka"), (3, "Brown"))
     choices = ((1, "Others"), (2, "In-house"))
 
     id = models.AutoField(primary_key=True)
@@ -117,6 +119,19 @@ class Payments(models.Model):
     customer_id = models.ForeignKey(Customer, on_delete=models.CASCADE)
     added_on = models.DateTimeField(auto_now_add=True)
     objects = models.Manager()
+
+
+# Define a signal receiver function to update payments when the customer of an order is changed
+@receiver(pre_save, sender=Orders)
+def update_payments_on_customer_change(sender, instance, **kwargs):
+    if instance.pk:
+        try:
+            old_instance = sender.objects.get(pk=instance.pk)
+            if old_instance.customer_id != instance.customer_id:
+                # Customer has been changed, update associated payments
+                Payments.objects.filter(orders_id=instance).update(customer_id=instance.customer_id)
+        except sender.DoesNotExist:
+            pass
 
 
 class CustomerBill(models.Model):
@@ -208,10 +223,7 @@ class Region(models.Model):
 
 class Invoice(models.Model):
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=255)
-    phone = models.CharField(max_length=255)
-    town = models.CharField(max_length=255)
-    total = models.CharField(max_length=255)
+    customer_id = models.ForeignKey(Customer, on_delete=models.CASCADE)
     added_on = models.DateTimeField(auto_now_add=True)
     objects = models.Manager()
 
@@ -219,16 +231,7 @@ class Invoice(models.Model):
 class InvoiceDetails(models.Model):
     id = models.AutoField(primary_key=True)
     invoice_id = models.ForeignKey(Invoice, on_delete=models.CASCADE)
-    orders_id = models.CharField(max_length=255)
-    kgs = models.CharField(max_length=255)
-    price = models.CharField(max_length=255)
-    packaging = models.CharField(max_length=255)
-    discount = models.CharField(max_length=255)
-    comment = models.CharField(max_length=255)
-    transport = models.CharField(max_length=255)
-    rider = models.CharField(max_length=255)
-    vat = models.CharField(max_length=255)
-    amount = models.CharField(max_length=255)
+    orders_id = models.ForeignKey(Orders, on_delete=models.CASCADE)
     added_on = models.DateTimeField(auto_now_add=True)
     objects = models.Manager()
 

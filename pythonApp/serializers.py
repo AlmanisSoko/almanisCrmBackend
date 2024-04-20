@@ -177,11 +177,28 @@ class InvoiceSerializer(serializers.ModelSerializer):
         model = Invoice
         fields = "__all__"
 
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response["customer"] = CustomerSerializer(instance.customer_id).data
+        return response
+
 
 class InvoiceDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = InvoiceDetails
         fields = "__all__"
+
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+
+        # Check if orders_id is not None before trying to serialize
+        if instance.orders_id is not None:
+            response["orders"] = OrdersSerializer(instance.orders_id).data
+        else:
+            response["orders"] = None
+
+        return response
+
 
 
 class InvoiceDetailedSerializer(serializers.ModelSerializer):
