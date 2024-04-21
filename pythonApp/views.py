@@ -191,11 +191,20 @@ class FarmerViewSet(viewsets.ViewSet):
 class CustomerViewSet(viewsets.ViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    pagination_class = PageNumberPagination()
 
     def list(self, request):
+        paginator = self.pagination_class
         customer = Customer.objects.all()
-        serializer = CustomerSerializer(customer, many=True, context={"request": request})
-        response_dict = {"error": False, "message": "All Customers List Data", "data": serializer.data}
+        page = paginator.paginate_queryset(customer, request, view=self)
+        if page is not None:
+            serializer = CustomerSerializer(page, many=True, context={"request": request})
+            response_data = paginator.get_paginated_response(serializer.data).data
+        else:
+            serializer = CustomerSerializer(customer, many=True, context={"request": request})
+            response_data = serializer.data
+
+        response_dict = {"error": False, "message": "All Customers List Data", "data": response_data}
         return Response(response_dict)
 
     def create(self, request):
