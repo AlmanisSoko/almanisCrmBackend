@@ -701,11 +701,20 @@ class CustomerOnlyViewSet(generics.ListAPIView):
 class PaymentsViewSet(viewsets.ViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    pagination_class = PageNumberPagination()
 
     def list(self, request):
+        paginator = self.pagination_class
         payments = Payments.objects.all().order_by('-id')
-        serializer = PaymentsSerializer(payments, many=True, context={"request": request})
-        response_dict = {"error": False, "message": "All Payments List Data", "data": serializer.data}
+        page = paginator.paginate_queryset(payments, request, view=self)
+        if page is not None:
+            serializer = PaymentsSerializer(page, many=True, context={"request": request})
+            response_data = paginator.get_paginated_response(serializer.data).data
+        else:
+            serializer = PaymentsSerializer(payments, many=True, context={"request": request})
+            response_data = serializer.data
+
+        response_dict = {"error": False, "message": "All Payments List Data", "data": response_data}
         return Response(response_dict)
 
     def create(self, request):
