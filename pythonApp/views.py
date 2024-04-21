@@ -113,13 +113,20 @@ class UserAccountDeleteView(generics.DestroyAPIView):
 class FarmerViewSet(viewsets.ViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    pagination_class = PageNumberPagination()
 
     def list(self, request):
+        paginator = self.pagination_class
         farmer = Farmer.objects.all()
-        serializer = FarmerSerializer(farmer, many=True, context={"request": request})
+        page = paginator.paginate_queryset(farmer, request, view=self)
+        if page is not None:
+            serializer = FarmerSerializer(page, many=True, context={"request": request})
+            response_data = paginator.get_paginated_response(serializer.data).data
+        else:
+            serializer = FarmerSerializer(farmer, many=True, context={"request": request})
+            response_data = serializer.data
 
-        response_dict = {"error": False, "message": "All Farmers List Data", "data": serializer.data}
-
+        response_dict = {"error": False, "message": "All Farmers List Data", "data": response_data}
         return Response(response_dict)
 
     def create(self, request):
