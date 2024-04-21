@@ -561,23 +561,28 @@ class TotalNegativeBalanceView(APIView):
 class OrdersViewSet(viewsets.ViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
-    pagination_class = PageNumberPagination  # Add this line
+    pagination_class = PageNumberPagination()
 
     def list(self, request):
-        orders = Orders.objects.all().order_by('-id')
-        serializer = OrdersSerializer(orders, many=True, context={"request": request})
+        paginator = self.pagination_class
+        orders_query = Orders.objects.all().order_by('-id')
+        page = paginator.paginate_queryset(orders_query, request, view=self)
+        if page is not None:
+            serializer = OrdersSerializer(page, many=True, context={"request": request})
+            response_data = paginator.get_paginated_response(serializer.data).data
+        else:
+            serializer = OrdersSerializer(orders_query, many=True, context={"request": request})
+            response_data = serializer.data
 
         today_date = datetime.today().strftime("%Y-%m-%d")
-        kilos_today = Orders.objects.filter(added_on__date=today_date)
-        kilos = 0
-        for kgs in kilos_today:
-            kilos += float(kgs.kgs)
+        daily_kgs = Orders.objects.filter(added_on__date=today_date).aggregate(total_kgs=Sum('kgs'))['total_kgs'] or 0
 
-        response_dict = {"error": False,
-                         "message": "All Orders List Data",
-                         "daily_kgs": kilos,
-                         "data": serializer.data
-                         }
+        response_dict = {
+            "error": False,
+            "message": "All Orders List Data",
+            "daily_kgs": daily_kgs,
+            "data": response_data
+        }
         return Response(response_dict)
 
     def create(self, request):
