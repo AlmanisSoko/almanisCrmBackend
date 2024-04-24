@@ -202,16 +202,30 @@ class CustomerViewSet(viewsets.ViewSet):
 
     def list(self, request):
         paginator = self.pagination_class
-        customer = Customer.objects.all()
-        page = paginator.paginate_queryset(customer, request, view=self)
+        search_query = request.query_params.get('search', None)
+        customer_query = Customer.objects.all().order_by('-id')
+
+        # Implementing the search functionality:
+        if search_query is not None:
+            customer_query = customer_query.filter(
+                Q(name__icontains=search_query) |
+                Q(phone__icontains=search_query) |
+                Q(town__icontains=search_query)
+            )
+
+        page = paginator.paginate_queryset(customer_query, request, view=self)
         if page is not None:
             serializer = CustomerSerializer(page, many=True, context={"request": request})
             response_data = paginator.get_paginated_response(serializer.data).data
         else:
-            serializer = CustomerSerializer(customer, many=True, context={"request": request})
+            serializer = CustomerSerializer(customer_query, many=True, context={"request": request})
             response_data = serializer.data
 
-        response_dict = {"error": False, "message": "All Customers List Data", "data": response_data}
+        response_dict = {
+            "error": False,
+            "message": "All Customers List Dat",
+            "data": response_data
+        }
         return Response(response_dict)
 
     def create(self, request):
@@ -581,7 +595,18 @@ class OrdersViewSet(viewsets.ViewSet):
 
     def list(self, request):
         paginator = self.pagination_class
+        search_query = request.query_params.get('search', None)
+
         orders_query = Orders.objects.all().order_by('-id')
+
+        # Implementing the search functionality:
+        if search_query is not None:
+            orders_query = orders_query.filter(
+                Q(name__icontains=search_query) |
+                Q(town__icontains=search_query) |
+                Q(phone__icontains=search_query)
+            )
+
         page = paginator.paginate_queryset(orders_query, request, view=self)
         if page is not None:
             serializer = OrdersSerializer(page, many=True, context={"request": request})
@@ -591,7 +616,8 @@ class OrdersViewSet(viewsets.ViewSet):
             response_data = serializer.data
 
         today_date = datetime.today().strftime("%Y-%m-%d")
-        daily_kgs = Orders.objects.filter(added_on__date=today_date).aggregate(total_kgs=Sum('kgs'))['total_kgs'] or 0
+        daily_kgs = Orders.objects.filter(added_on__date=today_date).aggregate(total_kgs=Sum('kgs'))[
+                        'total_kgs'] or 0
 
         response_dict = {
             "error": False,
@@ -705,16 +731,28 @@ class PaymentsViewSet(viewsets.ViewSet):
 
     def list(self, request):
         paginator = self.pagination_class
-        payments = Payments.objects.all().order_by('-id')
-        page = paginator.paginate_queryset(payments, request, view=self)
+        search_query = request.query_params.get('search', None)
+        payments_query = Payments.objects.all().order_by('-id')
+
+        # Implementing the search functionality:
+        if search_query is not None:
+            payments_query = payments_query.filter(
+                Q(paying_number__icontains=search_query)
+            )
+
+        page = paginator.paginate_queryset(payments_query, request, view=self)
         if page is not None:
             serializer = PaymentsSerializer(page, many=True, context={"request": request})
             response_data = paginator.get_paginated_response(serializer.data).data
         else:
-            serializer = PaymentsSerializer(payments, many=True, context={"request": request})
+            serializer = PaymentsSerializer(payments_query, many=True, context={"request": request})
             response_data = serializer.data
 
-        response_dict = {"error": False, "message": "All Payments List Data", "data": response_data}
+        response_dict = {
+            "error": False,
+            "message": "All Payments List Data",
+            "data": response_data
+        }
         return Response(response_dict)
 
     def create(self, request):
