@@ -103,21 +103,6 @@ class BillDetailsSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-# class OrdersSerializer(serializers.ModelSerializer):
-#     user = UserCreateSerializer(read_only=True)
-#
-#     class Meta:
-#         model = Orders
-#         fields = "__all__"
-#
-#     def to_representation(self, instance):
-#         response = super().to_representation(instance)
-#         response["user"] = instance.user_id
-#         response["farmer"] = FarmerSerializer(instance.farmer_id).data
-#         response["customer"] = CustomerSerializer(instance.customer_id).data
-#         return response
-#
-
 class OrdersSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
 

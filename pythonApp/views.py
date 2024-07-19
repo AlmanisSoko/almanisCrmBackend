@@ -724,6 +724,14 @@ class CustomerOnlyViewSet(generics.ListAPIView):
         return Customer.objects.all()
 
 
+class OnlyCustomerViewSet(viewsets.ViewSet):
+    def list(self, request):
+        customer = Customer.objects.all()
+        serializer = CustomerSerializer(customer, many=True, context={"request": request})
+        response_dict = {"error": False, "message": "Customer Data", "data": serializer.data}
+        return Response(response_dict)
+
+
 class PaymentsViewSet(viewsets.ViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -1263,11 +1271,13 @@ class RegionViewSet(viewsets.ViewSet):
     def create(self, request):
         try:
             serializer = RegionSerializer(data=request.data, context={"request": request})
+            print(serializer)
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            dict_response = {"error": False, "message": "Order Stored Successfully"}
-        except:
-            dict_response = {"error": True, "message": "An Error Occurred"}
+            dict_response = {"error": False, "message": "Order created Successfully", "order": serializer.data}
+        except Exception as e:
+            print("Error:", str(e))
+            dict_response = {"error": True, "message": f"Error During Saving Ticket Data: {str(e)}"}
 
         return Response(dict_response)
 
@@ -1482,6 +1492,17 @@ class FarmerStockViewSet(viewsets.ViewSet):
         stock = get_object_or_404(queryset, pk=pk)
         stock.delete()
         return Response({"error": False, "message": "Stock Deleted"})
+
+
+class PKTViewSet(viewsets.ViewSet):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request):
+        orders = Orders.objects.all().order_by('-id')
+        serializer = OrdersSerializer(orders, many=True, context={"request": request})
+        response_dict = {"error": False, "message": "Analytics Data", "data": serializer.data}
+        return Response(response_dict)
 
 
 farmer_list = FarmerViewSet.as_view({"get": "list"})

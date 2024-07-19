@@ -79,6 +79,13 @@ class Customer(models.Model):
     objects = models.Manager()
 
 
+class Region(models.Model):
+    id = models.AutoField(primary_key=True)
+    region = models.CharField(max_length=250)
+    added_on = models.DateTimeField(auto_now_add=True)
+    objects = models.Manager()
+
+
 class Orders(models.Model):
     choices1 = ((1, "Pishori"), (2, "Komboka"), (3, "Brown"))
     choices = ((1, "Others"), (2, "In-house"))
@@ -87,9 +94,10 @@ class Orders(models.Model):
     phone = models.CharField(max_length=255)
     name = models.CharField(max_length=255)
     customer_id = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True)
     town = models.CharField(max_length=255)
     farmer_id = models.ForeignKey(Farmer, on_delete=models.CASCADE)
-    user_id = models.ForeignKey(UserAccount, on_delete=models.CASCADE, blank=True, null=True)
+    user_id = models.ForeignKey(UserAccount, on_delete=models.CASCADE, blank=True, default=9, editable=True)
     kgs = models.CharField(max_length=255)
     packaging = models.CharField(max_length=255)
     transport = models.CharField(max_length=255)
@@ -211,13 +219,6 @@ class RicePrice(models.Model):
     pishori_date = models.DateField()
     komboka= models.CharField(max_length=250)
     rice_date = models.DateField()
-    objects = models.Manager()
-
-
-class Region(models.Model):
-    id = models.AutoField(primary_key=True)
-    region = models.CharField(max_length=250)
-    added_on = models.DateTimeField(auto_now_add=True)
     objects = models.Manager()
 
 
