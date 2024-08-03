@@ -72,7 +72,6 @@ class Customer(models.Model):
     name = models.CharField(max_length=255)
     phone = models.CharField(unique=True, max_length=255)
     secondary_phone = models.CharField(max_length=255, default=0, editable=True)
-    alternative_phone = models.CharField(max_length=255, default=0, editable=True)
     town = models.CharField(max_length=255)
     region = models.CharField(choices=choices, max_length=255)
     added_on = models.DateTimeField(auto_now_add=True)

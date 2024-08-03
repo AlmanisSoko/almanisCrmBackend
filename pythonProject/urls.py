@@ -5,9 +5,11 @@ from django.urls import path, include
 from rest_framework import routers
 
 from pythonApp import views
-from pythonApp.views import SuperUserRegistrationView, CustomerNameViewSet, FarmerNameViewSet, OrderNameViewSet, OrderByNameViewSet, \
+from pythonApp.views import SuperUserRegistrationView, CustomerNameViewSet, FarmerNameViewSet, OrderNameViewSet, \
+    OrderByNameViewSet, \
     CustomerOnlyViewSet, FarmerOnlyViewSet, CustomerDetailViewSet, FarmerStockNameViewSet, FarmerOnlyNameViewSet, \
-     TotalPositiveBalanceView, TotalNegativeBalanceView, CustomerViewSet, TotalBalanceView, TotalPaymentView, TotalDiscountView, TotalKilosView
+    TotalPositiveBalanceView, TotalNegativeBalanceView, CustomerViewSet, TotalBalanceView, TotalPaymentView, \
+    TotalDiscountView, TotalKilosView, search
 
 router = routers.DefaultRouter()
 router.register("farmer", views.FarmerViewSet, basename="farmer")
@@ -38,6 +40,7 @@ urlpatterns = [
     path('auth/', include('djoser.urls.jwt')),
     path('auth/', include('djoser.urls.authtoken')),
     path('auth/', include('djoser.social.urls')),
+    path('api/search/', search, name='search'),
     path('auth/superuser/', SuperUserRegistrationView.as_view({'post': 'create_superuser'}), name='superuser-registration'),
     path('api/customerbyname/<str:phone>', CustomerNameViewSet.as_view(), name="customerbyname"),
     path('api/customers/customers-with-balance/', CustomerViewSet.as_view({'get': 'customers_with_balance'}), name='customers-with-balance'),

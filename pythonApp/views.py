@@ -1,3 +1,4 @@
+from django.db.models.functions import ExtractYear
 from django.shortcuts import render, get_object_or_404
 from djoser.views import UserViewSet
 from datetime import datetime, timedelta
@@ -5,7 +6,7 @@ from datetime import datetime, timedelta
 from django.db.models import Q, Sum, F, DecimalField, Subquery, OuterRef, FloatField
 
 from rest_framework import viewsets, generics, status
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.pagination import PageNumberPagination
@@ -32,6 +33,29 @@ from pythonProject import settings
 User = get_user_model()
 
 # Create your views here.
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def search(request):
+    query = request.GET.get('query', '')
+
+    if not query:
+        return Response({"error": True, "message": "Query parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        customers = Customer.objects.filter(name__icontains=query)
+
+        customer_serializer = CustomerSerializer(customers, many=True, context={"request": request})
+
+        response_data = {
+            "customers": customer_serializer.data
+        }
+
+        return Response({"error": False, "message": "Search Results", "data": response_data}, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return Response({"error": True, "message": "An error occurred", "details": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class SuperUserRegistrationView(UserViewSet):
@@ -245,6 +269,7 @@ class CustomerViewSet(viewsets.ViewSet):
         serializer = CustomerSerializer(customer, context={"request": request})
 
         serializer_data = serializer.data
+
         # Accessing All the Orders Details of Current Customer
         orders_details = Orders.objects.filter(customer_id=serializer_data["id"]).order_by('-id')
         orders_details_serializers = OrdersSerializer(orders_details, many=True)
@@ -282,16 +307,83 @@ class CustomerViewSet(viewsets.ViewSet):
 
         balance = amount - t_amount
 
-        dict_response = {"error": False, "message": "Single Data Fetch",
-                         "data": serializer_data,
-                         "payment": len(payment_count_serializer.data),
-                         "buy_total": amount,
-                         "payed_total": t_amount,
-                         "balance": balance,
-                         "kgs": kgs,
-                         "discount": discount,
-                         "orders_count": len(orders_count_serializer.data)}
+        # Group orders by year
+        orders_by_year = Orders.objects.filter(customer_id=serializer_data["id"]).annotate(
+            year=ExtractYear('added_on')).values('year').annotate(total_kilos=Sum('kgs')).order_by('year')
+
+        # Group payments by year
+        payments_by_year = Payments.objects.filter(customer_id=serializer_data["id"]).annotate(
+            year=ExtractYear('added_on')).values('year').annotate(total_payment=Sum('payment')).order_by('year')
+
+        dict_response = {
+            "error": False,
+            "message": "Single Data Fetch",
+            "data": serializer_data,
+            "payment": len(payment_count_serializer.data),
+            "buy_total": amount,
+            "payed_total": t_amount,
+            "balance": balance,
+            "kgs": kgs,
+            "discount": discount,
+            "orders_count": len(orders_count_serializer.data),
+            "orders_by_year": list(orders_by_year),
+            "payments_by_year": list(payments_by_year),
+        }
         return Response(dict_response)
+
+    # def retrieve(self, request, pk=None):
+    #     queryset = Customer.objects.all()
+    #     customer = get_object_or_404(queryset, pk=pk)
+    #     serializer = CustomerSerializer(customer, context={"request": request})
+    #
+    #     serializer_data = serializer.data
+    #     # Accessing All the Orders Details of Current Customer
+    #     orders_details = Orders.objects.filter(customer_id=serializer_data["id"]).order_by('-id')
+    #     orders_details_serializers = OrdersSerializer(orders_details, many=True)
+    #     serializer_data["orders"] = orders_details_serializers.data
+    #
+    #     # Accessing All Orders of Current Customer
+    #     orders_count = Orders.objects.filter(customer_id=serializer_data["id"])
+    #     orders_count_serializer = OrdersSerializer(orders_count, many=True, context={"request": request})
+    #
+    #     # Total orders amount of current customer
+    #     orders_total = Orders.objects.filter(customer_id=serializer_data["id"])
+    #     amount = 0
+    #     discount = 0
+    #     kgs = 0
+    #     for total in orders_total:
+    #         amount = amount + float(total.amount)
+    #         discount = discount + float(total.discount)
+    #         kgs = kgs + float(total.kgs)
+    #
+    #     serializer_data1 = serializer.data
+    #     # Accessing All the Payment Details of Current Customer
+    #     payments_details = Payments.objects.filter(customer_id=serializer_data1["id"]).order_by('-id')
+    #     payments_details_serializers = PaymentsSerializer(payments_details, many=True)
+    #     serializer_data["payments"] = payments_details_serializers.data
+    #
+    #     serializer_data2 = serializer_data
+    #     payment_count = Payments.objects.filter(customer_id=serializer_data2["id"])
+    #     payment_count_serializer = PaymentsSerializer(payment_count, many=True, context={"request": request})
+    #
+    #     # Total Payment of current customer
+    #     payment_total = Payments.objects.filter(customer_id=serializer_data2["id"])
+    #     t_amount = 0
+    #     for balance in payment_total:
+    #         t_amount = t_amount + float(balance.payment)
+    #
+    #     balance = amount - t_amount
+    #
+    #     dict_response = {"error": False, "message": "Single Data Fetch",
+    #                      "data": serializer_data,
+    #                      "payment": len(payment_count_serializer.data),
+    #                      "buy_total": amount,
+    #                      "payed_total": t_amount,
+    #                      "balance": balance,
+    #                      "kgs": kgs,
+    #                      "discount": discount,
+    #                      "orders_count": len(orders_count_serializer.data)}
+    #     return Response(dict_response)
 
     def update(self, request, pk=None):
         try:
@@ -911,12 +1003,14 @@ class HomeApiViewSet(viewsets.ViewSet):
         current_date_7days = current_date_7days.strftime("%Y-%m-%d")
         bill_details_today = Orders.objects.filter(added_on__date=current_date)
         transport_today = 0
+        kilos_today = 0
         rider_today = 0
         packaging_today = 0
         for bill in bill_details_today:
             transport_today += float(bill.transport)
             rider_today += float(bill.rider)
             packaging_today += float(bill.packaging)
+            kilos_today += float(bill.kgs)
 
         dict_response = {
                          "error": False,
@@ -927,6 +1021,7 @@ class HomeApiViewSet(viewsets.ViewSet):
                          "farmer": len(farmer_serializer.data),
                          "packaging_today": packaging_today,
                          "transport_today": transport_today,
+                         "kilos_today": kilos_today,
                          "rider_today": rider_today,
                          }
         return Response(dict_response)
