@@ -7,9 +7,7 @@
     <list default="true" id="5088a076-5cb2-4e0b-a274-1b002b0a44de" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pythonApp/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/pythonApp/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pythonApp/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/pythonApp/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pythonProject/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/pythonProject/urls.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,7 +56,6 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="C:\Users\BraIT\Desktop\PROJECTS 2\New folder\brmss\venv\Scripts\python.exe" />
-      <option name="SDK_NAME" value="Python 3.11 (brmss)" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -127,6 +124,16 @@
           <url>file://$PROJECT_DIR$/pythonApp/models.py</url>
           <line>6</line>
           <option name="timeStamp" value="9" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pythonApp/views.py</url>
+          <line>483</line>
+          <option name="timeStamp" value="10" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/pythonApp/views.py</url>
+          <line>753</line>
+          <option name="timeStamp" value="12" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

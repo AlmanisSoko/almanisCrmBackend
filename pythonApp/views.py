@@ -331,60 +331,6 @@ class CustomerViewSet(viewsets.ViewSet):
         }
         return Response(dict_response)
 
-    # def retrieve(self, request, pk=None):
-    #     queryset = Customer.objects.all()
-    #     customer = get_object_or_404(queryset, pk=pk)
-    #     serializer = CustomerSerializer(customer, context={"request": request})
-    #
-    #     serializer_data = serializer.data
-    #     # Accessing All the Orders Details of Current Customer
-    #     orders_details = Orders.objects.filter(customer_id=serializer_data["id"]).order_by('-id')
-    #     orders_details_serializers = OrdersSerializer(orders_details, many=True)
-    #     serializer_data["orders"] = orders_details_serializers.data
-    #
-    #     # Accessing All Orders of Current Customer
-    #     orders_count = Orders.objects.filter(customer_id=serializer_data["id"])
-    #     orders_count_serializer = OrdersSerializer(orders_count, many=True, context={"request": request})
-    #
-    #     # Total orders amount of current customer
-    #     orders_total = Orders.objects.filter(customer_id=serializer_data["id"])
-    #     amount = 0
-    #     discount = 0
-    #     kgs = 0
-    #     for total in orders_total:
-    #         amount = amount + float(total.amount)
-    #         discount = discount + float(total.discount)
-    #         kgs = kgs + float(total.kgs)
-    #
-    #     serializer_data1 = serializer.data
-    #     # Accessing All the Payment Details of Current Customer
-    #     payments_details = Payments.objects.filter(customer_id=serializer_data1["id"]).order_by('-id')
-    #     payments_details_serializers = PaymentsSerializer(payments_details, many=True)
-    #     serializer_data["payments"] = payments_details_serializers.data
-    #
-    #     serializer_data2 = serializer_data
-    #     payment_count = Payments.objects.filter(customer_id=serializer_data2["id"])
-    #     payment_count_serializer = PaymentsSerializer(payment_count, many=True, context={"request": request})
-    #
-    #     # Total Payment of current customer
-    #     payment_total = Payments.objects.filter(customer_id=serializer_data2["id"])
-    #     t_amount = 0
-    #     for balance in payment_total:
-    #         t_amount = t_amount + float(balance.payment)
-    #
-    #     balance = amount - t_amount
-    #
-    #     dict_response = {"error": False, "message": "Single Data Fetch",
-    #                      "data": serializer_data,
-    #                      "payment": len(payment_count_serializer.data),
-    #                      "buy_total": amount,
-    #                      "payed_total": t_amount,
-    #                      "balance": balance,
-    #                      "kgs": kgs,
-    #                      "discount": discount,
-    #                      "orders_count": len(orders_count_serializer.data)}
-    #     return Response(dict_response)
-
     def update(self, request, pk=None):
         try:
             queryset = Customer.objects.all()
@@ -749,10 +695,14 @@ class OrdersViewSet(viewsets.ViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             dict_response = {"error": False, "message": "Order Updated Successfully"}
-        except:
-            dict_response = {"error": True, "message": "An Error Occurred"}
 
-        return Response(dict_response)
+        except ValidationError as e:
+            dict_response = {"error": True, "message": "Validation Error", "details": str(e)}
+        except Exception as e:
+            dict_response = {"error": True, "message": "An Error Occurred", "details": str(e)}
+
+        return Response(dict_response,
+                        status=status.HTTP_400_BAD_REQUEST if dict_response['error'] else status.HTTP_200_OK)
 
     def destroy(self, request, pk=None):
         queryset = Orders.objects.all()
@@ -837,6 +787,7 @@ class PaymentsViewSet(viewsets.ViewSet):
         # Implementing the search functionality:
         if search_query is not None:
             payments_query = payments_query.filter(
+                Q(orders_id__id__icontains=search_query) |
                 Q(paying_number__icontains=search_query)
             )
 
