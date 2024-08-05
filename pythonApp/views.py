@@ -786,10 +786,16 @@ class PaymentsViewSet(viewsets.ViewSet):
 
         # Implementing the search functionality:
         if search_query is not None:
-            payments_query = payments_query.filter(
-                Q(orders_id__id__icontains=search_query) |
-                Q(paying_number__icontains=search_query)
-            )
+            if search_query.isdigit():
+                # Search by orders_id if the search query is a number
+                payments_query = payments_query.filter(
+                    Q(orders_id__id=search_query)
+                )
+            else:
+                # Search by other fields for non-numeric queries
+                payments_query = payments_query.filter(
+                    Q(paying_number__icontains=search_query)
+                )
 
         page = paginator.paginate_queryset(payments_query, request, view=self)
         if page is not None:
